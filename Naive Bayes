@@ -1,0 +1,58 @@
+library(e1071)
+library(rpart)
+library(caret)
+library(AUC)
+library(pROC)
+
+x<- cor18
+
+#For correctOne1015WithSeq.csv data set(ae_indSum is numeric)
+nonpredictive<-c("MaxCharScore", "SumCharScore", "MaxChronicCount", "SumChronicCount","lbowel","aeindSumtoP","Inpatient","InDays","aeindSumtoZeo")
+
+# as.factor for running naive bayes
+for (j in 1:ncol(x)) {
+    x[, j] <- as.factor(x[, j])
+}
+
+
+x.shuffle = x[sample(1:nrow(x)), ]
+
+res<-data.frame()
+
+folds <- 10
+
+
+for(i in 1:folds) {
+
+    print(paste("iteration: ", i))
+
+    #separate train and test
+    x.train <- x.shuffle[which(1:nrow(x.shuffle) %% folds != i %% folds), ]
+    x.test <- x.shuffle[which(1:nrow(x.shuffle) %% folds == i %% folds), ]
+
+
+    model<-naiveBayes(formula(aeind90~.),data=x.train[,-which(names(x.train) %in% nonpredictive)])
+
+    p <- predict(model, x.test[,-which(names(x.train) %in% nonpredictive)], type= 'raw')[, 2]
+
+    res = rbind(res,cbind(p,as.numeric(as.character(x.test$aeind90))))
+}
+
+message('getting metrics')
+threshold = 0.5
+
+tp = nrow(res[res[,2]==1 & res[,1]>=threshold,])
+fn = nrow(res[res[,2]==1 & res[,1]<threshold,])
+tn = nrow(res[res[,2]==0 & res[,1]<threshold,])
+fp = nrow(res[res[,2]==0 & res[,1]>=threshold,])
+precision = tp / (tp + fp)
+recall = tp / (tp + fn)
+accuracy = (tp + tn) / (tp + fp + tn + fn)
+auc = 0
+res.stats = round(c(precision, recall, accuracy, auc, tp, fp, tn, fn, nrow(res)), digits = 4)
+print(res.stats)
+
+auc = roc(res[,2], res[,1])$auc
+res.stats = round(c(precision, recall, accuracy, auc, tp, fp, tn, fn, nrow(res)), digits = 4)
+print(res.stats)
+print(confusionMatrix(as.factor(as.character(as.numeric(res[,1]>=threshold))),as.factor(as.character(res[,2]))))
