@@ -1,0 +1,61 @@
+d = "filename.csv"
+
+#Admission Type
+d$inpatient[is.na(d$inpatient)] <- 0
+d$er[is.na(d$er)] <- 0
+d$outpatient[is.na(d$outpatient)] <- 0
+d$ae_ind[is.na(d$ae_ind)] <- 0
+
+#Chronic conditions
+d$mi[is.na(d$mi)] <- 0
+d$chf[is.na(d$chf)] <- 0
+d$pvd[is.na(d$pvd)] <- 0
+d$cerebro[is.na(d$cerebro)] <- 0
+d$dementia[is.na(d$dementia)] <- 0
+d$pulmon[is.na(d$pulmon)] <- 0
+d$rheum[is.na(d$rheum)] <- 0 
+d$ulcer[is.na(d$ulcer)] <- 0
+d$mildliver[is.na(d$mildliver)] <- 0
+d$hemipleg[is.na(d$hemipleg)] <- 0
+d$renal[is.na(d$renal)] <- 0 
+d$cancer[is.na(d$cancer)] <- 0
+d$tumor[is.na(d$tumor)] <- 0
+d$aids[is.na(d$aids)] <- 0
+d$diab_wo_com[is.na(d$diab_wo_com)] <- 0
+d$diab_w_com[is.na(d$diab_w_com)] <- 0
+d$sevliver[is.na(d$sevliver)] <- 0
+
+#Compute Charlson Index
+d$ScoreCount2 <- d$hemipleg+d$renal+d$cancer+d$diab_w_com
+d$ScoreCount2 <- d$ScoreCount2 *2
+d$ScoreCount1 <- d$chf + d$pvd + d$cerebro + d$dementia + d$pulmon + d$rheum + d$ulcer + d$mildliver + d$diab_wo_com + d$mi
+d$ScoreCount6 <- d$aids+d$tumor
+d$ScoreCount6 <- d$ScoreCount6 * 6
+d$ScoreCount3 <- d$sevliver
+d$ScoreCount3 <- d$ScoreCount3 * 3
+d$ScoreCount6 <- d$aids+df$tumor
+d$ScoreCount6 <- d$ScoreCount6 * 6
+#Add Score By Age
+d$AgeCount <- ifelse(d$AGEGRP == 4,1,ifelse(d$AGEGRP == 5,2,ifelse(d$AGEGRP == 6,3,0)))
+#Sum of the total Score for charlson Index
+d$score <- d$ScoreCount1+d$ScoreCount2+d$ScoreCount3+d$ScoreCount6+d$AgeCount
+
+#Average Day computation
+dayAvg <- sqldf("SELECT ENROLID, AVG(DAYS) AS TotalDays FROM d GROUP BY ENROLID")
+summary(dayAvg$TotalDays)
+
+#180 days before surgery compution event level
+# DiffClaimSur = surgerydate - claimdate
+BeforeSurgery <- sqldf("SELECT ENROLID, DiffClaimSur, ae_ind FROM lbsubset WHERE DiffClaimSur >= 0 AND DiffClaimSur <= 180")
+
+#Sum/Count of ae_ind before surgery
+aeindsum <- sqldf("SELECT ENROLID,SUM(aeindSum) AS aeindSum FROM lbsub GROUP BY ENROLID")
+# if needed convert the count to 1 and 0.1 for greater than 0.
+aeindsum$aeindSumCount <- ifelse(sqlaeindsum$aeindSum != 0,1,0)
+
+# 90 days after surgery compution event level
+lbsub$aeindSum <- ifelse(lbsub$DiffSurClaim <= 90, ifelse(lbsub$ae_ind == 1, 1, 0), 0)
+
+
+
+
