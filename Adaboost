@@ -3,16 +3,14 @@ library(caret)
 library(AUC)
 library(pROC)
 
-x<- d
+x <- read.csv("filename.csv")
 
 #For correctOne1015WithSeq.csv data set(ae_indSum is numeric)
-nonpredictive<-c("MaxCharScore", "SumCharScore", "MaxChronicCount", "SumChronicCount","lbowel","aeindSumtoP","Inpatient","InDays","aeindSumtoZeo","X","ENROLID")
-
-x$Sequence <- as.factor(x$Sequence)
+nonpredictive<-c("MaxCharScore", "SumCharScore", "MaxChronicCount", "SumChronicCount","lbowel","aeindSumtoP","Inpatient","InDays","ENROLID")
 
 x.shuffle = x[sample(1:nrow(x)), ]
 
-res<-data.frame()
+res <- data.frame()
 
 folds <- 10
 
