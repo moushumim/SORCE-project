@@ -1,5 +1,9 @@
+#read file
 lb <- "largebowel.csv"
+
 library(sqldf)
+
+#Chronic condition consideration
 chronicCondition17 <- sqldf("SELECT ENROLID,MAX(mi) AS mi,MAX(chf) AS chf,MAX(pvd) AS pvd,MAX(cerebro) AS cerebro,
 MAX(dementia) AS dementia,MAX(pulmon) AS pulmon,MAX(rheum) AS rheum,MAX(ulcer) AS ulcer,MAX(mildliver) AS mildliver,
 MAX(hemipleg) AS hemipleg,MAX(renal) AS renal,MAX(cancer) AS cancer,MAX(tumor) AS tumor,MAX(aids) AS aids,
