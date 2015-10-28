@@ -4,10 +4,10 @@ library(caret)
 library(AUC)
 library(pROC)
 
-x<- cor18
+x <- read.csv("filename.csv")
 
 #For correctOne1015WithSeq.csv data set(ae_indSum is numeric)
-nonpredictive<-c("MaxCharScore", "SumCharScore", "MaxChronicCount", "SumChronicCount","lbowel","aeindSumtoP","Inpatient","InDays","aeindSumtoZeo")
+nonpredictive<-c("MaxCharScore", "SumCharScore", "MaxChronicCount", "SumChronicCount","lbowel","aeindSumtoP","Inpatient","InDays")
 
 # as.factor for running naive bayes
 for (j in 1:ncol(x)) {
