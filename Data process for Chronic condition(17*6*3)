@@ -1,5 +1,7 @@
+#Script for to crete the colums which is a combination of chronic condition,monthbucket and admission type
+
 1. Extract designated columns
-   cat for17And6AndM.csv | awk -F, '{ printf("%s", $3); for (i = 4; i <= 20; i++) { printf("\t%s", $i); } for (i =21 ; i <= 23; i++) { printf("\t%s", $i); } printf("\t%s\n", $25); }' > sourceND.tsv
+   cat filename.csv | awk -F, '{ printf("%s", $3); for (i = 4; i <= 20; i++) { printf("\t%s", $i); } for (i =21 ; i <= 23; i++) { printf("\t%s", $i); } printf("\t%s\n", $25); }' > sourceND.tsv
 
 2. Separate out header and data
    head -1 sourceND.tsv > source_headerNew.tsv
