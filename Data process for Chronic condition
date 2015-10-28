@@ -1,0 +1,19 @@
+1. Extract designated columns
+   cat for17And6AndM.csv | awk -F, '{ printf("%s", $3); for (i = 4; i <= 20; i++) { printf("\t%s", $i); } for (i =21 ; i <= 23; i++) { printf("\t%s", $i); } printf("\t%s\n", $25); }' > sourceND.tsv
+
+2. Separate out header and data
+   head -1 sourceND.tsv > source_headerNew.tsv
+   cat sourceND.tsv | awk 'NR != 1 { print $0; }' > source_dataNew.tsv
+
+3. Construct new header
+head source_headerNew.tsv | awk '{ printf("%s", $1); for (i = 0; i < 7; i++) for (j = 2; j <= 18; j++) for (k = 19; k <= 21; k++) printf(",\"month%d_%s_%s", i, substr($j, 2, length($j) - 2), substr($k, 2)); printf("\n"); }' > new_headerND.csv
+
+4. Sort and get rid of duplicate
+   cat source_dataNew.tsv | sort -u > input_dataNew.tsv
+
+5. Compile C prog and prepare new data
+   gcc xlate.c
+   cat input_dataNew.tsv | ./a.out > new_dataNew.csv
+
+6. Merge new header and data
+   cat new_headerND.csv new_dataNew.csv > flatNew.csv
