@@ -1,12 +1,12 @@
 d = "filename.csv"
 
-#Admission Type
+#Admission Type to get rid of NA values
 d$inpatient[is.na(d$inpatient)] <- 0
 d$er[is.na(d$er)] <- 0
 d$outpatient[is.na(d$outpatient)] <- 0
 d$ae_ind[is.na(d$ae_ind)] <- 0
 
-#Chronic conditions
+#Chronic conditions to get rid of NA values
 d$mi[is.na(d$mi)] <- 0
 d$chf[is.na(d$chf)] <- 0
 d$pvd[is.na(d$pvd)] <- 0
@@ -25,7 +25,7 @@ d$diab_wo_com[is.na(d$diab_wo_com)] <- 0
 d$diab_w_com[is.na(d$diab_w_com)] <- 0
 d$sevliver[is.na(d$sevliver)] <- 0
 
-#Compute Charlson Index
+#Compute Charlson Index to get rid of NA values
 d$ScoreCount2 <- d$hemipleg+d$renal+d$cancer+d$diab_w_com
 d$ScoreCount2 <- d$ScoreCount2 *2
 d$ScoreCount1 <- d$chf + d$pvd + d$cerebro + d$dementia + d$pulmon + d$rheum + d$ulcer + d$mildliver + d$diab_wo_com + d$mi
