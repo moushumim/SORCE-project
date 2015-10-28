@@ -1,13 +1,16 @@
+#Library
 library(ada)
 library(caret)
 library(AUC)
 library(pROC)
 
+#Read file
 x <- read.csv("filename.csv")
 
-#For correctOne1015WithSeq.csv data set(ae_indSum is numeric)
+#Nonpredictive attributes
 nonpredictive<-c("MaxCharScore", "SumCharScore", "MaxChronicCount", "SumChronicCount","lbowel","aeindSumtoP","Inpatient","InDays","ENROLID")
 
+#Shuffle the data
 x.shuffle = x[sample(1:nrow(x)), ]
 
 res <- data.frame()
@@ -23,15 +26,10 @@ print(paste("iteration: ", i))
 x.train <- x.shuffle[which(1:nrow(x.shuffle) %% folds != i %% folds), ]
 x.test <- x.shuffle[which(1:nrow(x.shuffle) %% folds == i %% folds), ]
 
-#optional part.
-#control <- rpart.control(cp = 0.01,minsplit = 20,maxdepth = 25)
-
-model <- ada(formula(aeind90~.), data=x.train[,-which(names(x.train) %in% nonpredictive)],iter = 300,control = control)
-
+model <- ada(formula(aeind90~.), data=x.train[,-which(names(x.train) %in% nonpredictive)])
 p <- predict(model, newdata = x.test[,-which(names(x.train) %in% nonpredictive)], type='prob')[, 2]
 
 res = rbind(res,cbind(p,as.numeric(as.character(x.test$aeind90))))
-
 
 }
 
