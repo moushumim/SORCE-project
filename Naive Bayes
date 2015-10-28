@@ -6,10 +6,10 @@ library(pROC)
 
 x <- read.csv("filename.csv")
 
-#For correctOne1015WithSeq.csv data set(ae_indSum is numeric)
+#Nonpredictive attributes
 nonpredictive<-c("MaxCharScore", "SumCharScore", "MaxChronicCount", "SumChronicCount","lbowel","aeindSumtoP","Inpatient","InDays")
 
-# as.factor for running naive bayes
+# as.factor for naive bayes
 for (j in 1:ncol(x)) {
     x[, j] <- as.factor(x[, j])
 }
