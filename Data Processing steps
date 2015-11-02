@@ -46,7 +46,7 @@ summary(dayAvg$TotalDays)
 
 #180 days before surgery compution event level
 # DiffClaimSur = surgerydate - claimdate
-BeforeSurgery <- sqldf("SELECT ENROLID, DiffClaimSur, ae_ind FROM lbsubset WHERE DiffClaimSur >= 0 AND DiffClaimSur <= 180")
+BeforeSurgery <- sqldf("SELECT ENROLID, DiffClaimSur FROM lbsubset WHERE DiffClaimSur >= 0 AND DiffClaimSur <= 180")
 
 #Count of ae_ind before surgery
 aeindsum <- sqldf("SELECT ENROLID,SUM(aeindSum) AS aeindSum FROM lbsub GROUP BY ENROLID")
