@@ -55,6 +55,9 @@ aeindsum <- sqldf("SELECT ENROLID,SUM(aeindSum) AS aeindSum FROM lbsub GROUP BY 
 #first take the difference of ClaimDate and surgeryDate. And keep the value range 0 to 180.
 d$aeindSum <- ifelse(d$DiffClaimSur <= 90, ifelse(d$ae_ind == 1, 1, 0), 0)
 
+#Create MonthBucket 
+d$monthBucket <- ifelse(d$DiffSurClaim <= 30,1,ifelse(d$DiffSurClaim <= 60,2,ifelse(d$DiffSurClaim <= 90,3,ifelse(d$DiffSurClaim <= 120,4,ifelse(d$DiffSurClaim <= 150,5,
+ifelse(d$DiffSurClaim <= 180,6,0))))))
 
 
 
