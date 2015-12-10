@@ -52,7 +52,7 @@ BeforeSurgery <- sqldf("SELECT ENROLID, DiffClaimSur FROM lbsubset WHERE DiffCla
 aeindsum <- sqldf("SELECT ENROLID,SUM(aeindSum) AS aeindSum FROM lbsub GROUP BY ENROLID")
 
 # 90 days after surgery compution event level
-#first take the difference of ClaimDate and surgeryDate. And keep the value range 0 to 180.
+#first take the difference of ClaimDate and surgeryDate. And keep the value range 0 to 90.
 d$aeindSum <- ifelse(d$DiffClaimSur <= 90, ifelse(d$ae_ind == 1, 1, 0), 0)
 
 #Create MonthBucket 
