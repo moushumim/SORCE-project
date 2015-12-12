@@ -1,7 +1,6 @@
 library(e1071)
 library(rpart)
 library(caret)
-library(AUC)
 library(pROC)
 
 x <- read.csv("filename.csv")
