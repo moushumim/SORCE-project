@@ -1,0 +1,78 @@
+STEPS
+
+1. grab required columns
+
+awk -F, '{
+  printf("%s", $2);
+
+  for (i = 3; i <= 19; i++) {
+    printf(",%s", $i);
+  }
+
+  for (i = 20; i <= 22; i++) {
+    printf(",%s", $i);
+  }
+
+  printf("\n");
+}' forseq.csv > source.csv
+
+2. prepare data
+
+awk -F, -f data.awk source.csv > sequence1.csv
+
+REFERENCE
+
+1. data.awk
+
+BEGIN {
+  previd = "";
+  str = "";
+}
+
+# source header processor
+NR == 1 {
+  for (i = 1; i <= (1 + 17 + 3); i++) {
+    colnames[i] = substr($i, 2, length($i) - 2);
+  }
+
+  printf("%s,\"Sequence\"\n", $1);
+}
+
+# source record processor
+NR > 1 {
+  if (previd != $1) {
+    if (previd != "") {
+      printf("%s,%s\n", previd, str);
+    }
+
+    str = "";
+  }
+
+  previd = $1;
+  row = "";
+
+  for (i = 2; i <= NF; i++) {
+    if (i in colnames) {
+      if ($i == "1") {
+        if (row == "") {
+          row = colnames[i];
+        } else {
+          row = row " " colnames[i];
+        }
+      }
+    }
+  }
+
+  if (str == "") {
+    str = row ";";
+  } else {
+    str = str " " row ";";
+  }
+}
+
+END {
+  if (previd != "") {
+    printf("%s,%s\n", previd, str);
+  }
+}
+
