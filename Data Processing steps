@@ -44,14 +44,14 @@ d$score <- d$ScoreCount1+d$ScoreCount2+d$ScoreCount3+d$ScoreCount6+d$AgeCount
 dayAvg <- sqldf("SELECT ENROLID, AVG(DAYS) AS TotalDays FROM d GROUP BY ENROLID")
 summary(dayAvg$TotalDays)
 
-#180 days before surgery compution event level
+#180 days before surgery
 # DiffClaimSur = surgerydate - claimdate
 BeforeSurgery <- sqldf("SELECT ENROLID, DiffClaimSur FROM lbsubset WHERE DiffClaimSur >= 0 AND DiffClaimSur <= 180")
 
 #Count of ae_ind before surgery
 aeindsum <- sqldf("SELECT ENROLID,SUM(aeindSum) AS aeindSum FROM lbsub GROUP BY ENROLID")
 
-# 90 days after surgery compution event level
+# 90 days after surgery
 #first take the difference of ClaimDate and surgeryDate. And keep the value range 0 to 90.
 d$aeindSum <- ifelse(d$DiffClaimSur <= 90, ifelse(d$ae_ind == 1, 1, 0), 0)
 
