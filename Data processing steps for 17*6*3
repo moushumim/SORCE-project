@@ -19,3 +19,173 @@ head source_headerNew.tsv | awk '{ printf("%s", $1); for (i = 0; i < 7; i++) for
 
 6. Merge new header and data
    cat new_headerND.csv new_dataNew.csv > flatNew.csv
+
+
+1. FILE: source.awk
+
+{
+	printf("%s", $3);
+
+	for (i = 4; i <= 20; i++) {
+		printf("\t%s", $i);
+	}
+
+	printf("\t%s", $25);
+
+	for (i = 21; i <= 23; i++) {
+		printf("\t%s", $i);
+	}
+
+	printf("\n");
+}
+2. FILE: xlate_2_2.c
+
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_MONTH 7
+#define MAX_ADMTYPE 3
+#define MAX_CHRONIC 17
+
+int main() {
+	char previd[16], newid[16];
+
+	int data[MAX_MONTH][MAX_ADMTYPE][MAX_CHRONIC];
+
+	int row[MAX_CHRONIC];
+	int month;
+	int admtype[MAX_ADMTYPE]; // "inpatient", "er", "outpatient"
+
+	int i, j, k;
+
+	strcpy(previd, "");
+
+	while (scanf("%s", newid) != EOF) { // 1. id
+		for (i = 0; i < MAX_CHRONIC; i++) { // 2. 17 chronic conditions
+			scanf("%d", &row[i]);
+		}
+
+		scanf("%d", &month); // 3. month bucket
+
+		for (i = 0; i < 3; i++) { // 4. 3 admission types
+			scanf("%d", &admtype[i]);
+		}
+
+		if (strcmp(newid, previd)) {
+			if (strcmp(previd, "")) {
+				printf("%s", previd);
+
+				for (i = 0; i < MAX_MONTH; i++) {
+					for (j = 0; j < MAX_ADMTYPE; j++) {
+						for (k = 0; k < MAX_CHRONIC; k++) {
+							printf("\t%d", data[i][j][k]);
+						}
+					}
+				}
+
+				printf("\n");
+			}
+
+			for (i = 0; i < MAX_MONTH; i++) {
+				for (j = 0; j < MAX_ADMTYPE; j++) {
+					for (k = 0; k < MAX_CHRONIC; k++) {
+						data[i][j][k] = 0;
+					}
+				}
+			}
+		}
+
+		strcpy(previd, newid);
+
+		i = month;
+
+		if (i >= MAX_MONTH) { // bad data
+			continue;
+		}
+
+		for (j = 0; j < MAX_ADMTYPE; j++) {
+			if (admtype[j] == 1) {
+				break;
+			}
+		}
+
+		if (j == MAX_ADMTYPE) { // bad data
+			continue;
+		}
+
+		for (k = 0; k < MAX_CHRONIC; k++) {
+			data[i][j][k] = data[i][j][k] || row[k];
+		}
+	}
+
+	if (strcmp(previd, "")) {
+		printf("%s", previd);
+
+		for (i = 0; i < MAX_MONTH; i++) {
+			for (j = 0; j < MAX_ADMTYPE; j++) {
+				for (k = 0; k < MAX_CHRONIC; k++) {
+					printf("\t%d", data[i][j][k]);
+				}
+			}
+		}
+
+		printf("\n");
+	}
+
+	return 0;
+}
+
+3. FILE: new_data.awk
+
+# source header processor
+NR == 1 {
+	for (i = 4; i <= 20; i++) {
+		condition[i-4] = substr($i, 2, length($i) - 2);
+	}
+
+	for (i = 21; i <= 23; i++) {
+		admtype[i-21] = substr($i, 2, length($i) - 2);
+	}
+
+	# print header
+
+	printf("%s", $1);
+
+	for (month = 0; month < 7; month++) {
+		for (adm = 0; adm < 3; adm++) {
+			printf(",\"month%d_%s\"", month, admtype[adm]);
+		}
+	}
+
+	printf("\n");
+}
+
+# new data step 1 processor
+NR > 1 {
+	printf("%s", $1); # patient id
+
+	for (month = 0; month < 7; month++) {
+		for (adm = 0; adm < 3; adm++) {
+			str = "";
+
+			for (chronic = 0; chronic < 17; chronic++) {
+				i = 2 + (month * 3 * 17) + (adm * 17) + chronic;
+
+				if (i <= NF) {
+					if ($i == "1") {
+						str = str condition[chronic] ";";
+					}
+				}
+			}
+
+			if (str == "") {
+				str = ";";
+			}
+
+			printf(",%s", str);
+		}
+	}
+
+	printf("\n");
+}
+
